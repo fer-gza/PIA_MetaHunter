@@ -1,0 +1,33 @@
+metahunter/
+├── src/                      # Código fuente principal
+│   ├── metahunter.py         # Script principal (CLI + lógica básica)
+│   ├── scanner.py            # Módulo de detección de metadatos
+│   ├── cleaner.py            # Módulo de limpieza segura
+│   └── reporter.py           # Módulo para generar reportes
+│
+├── examples/                 # Archivos sintéticos para pruebas
+│   ├── sample1.jpg
+│   ├── sample2.pdf
+│   └── sample_report.md
+│
+├── docs/                     # Documentación y material de apoyo
+│   ├── README_docs.md        # Guía de usuario o instalación detallada
+│   └── ethical_statement.md  # Declaración ética y legal
+│
+├── proposals/                # Propuesta técnica
+│   └── propuesta.md
+│
+├── reports/                  # Carpeta donde se generarán los reportes
+│   └── (vacía al inicio)
+│
+├── scripts/                  # Scripts auxiliares para automatización
+│   ├── scan_folder.sh
+│   └── scan_folder.ps1
+│
+├── tests/                    # Pruebas iniciales
+│   └── test_scanner.py
+│
+├── README.md                 # Descripción principal del proyecto
+├── requirements.txt          # Dependencias de Python
+├── .gitignore                # Archivos a ignorar por Git
+└── LICENSE
