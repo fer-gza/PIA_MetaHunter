@@ -1,5 +1,6 @@
 # 🧠 MetaHunter  
 ### Escáner y limpiador inteligente de metadatos
+### Fernando Garza Chávez
 
 ---
 
