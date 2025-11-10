@@ -43,3 +43,9 @@ Su propósito es **proteger la privacidad y la información confidencial** de la
 | **Bash / PowerShell** | Automatización y ejecución masiva |
 | **Markdown / HTML** | Reportes técnicos automatizados |
 | **GitHub** | Control de versiones y documentación |
+
+---
+
+📦 Estado del proyecto
+
+✅ Módulo `cleaner.py` funcional en `/src/metahunter`
