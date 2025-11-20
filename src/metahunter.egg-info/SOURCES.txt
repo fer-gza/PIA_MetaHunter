@@ -1,0 +1,16 @@
+LICENSE
+README.md
+pyproject.toml
+src/metahunter/__init__.py
+src/metahunter/__main__.py
+src/metahunter/cleaner.py
+src/metahunter/cli.py
+src/metahunter/reporter.py
+src/metahunter.egg-info/PKG-INFO
+src/metahunter.egg-info/SOURCES.txt
+src/metahunter.egg-info/dependency_links.txt
+src/metahunter.egg-info/entry_points.txt
+src/metahunter.egg-info/requires.txt
+src/metahunter.egg-info/top_level.txt
+tests/test_cleaner.py
+tests/test_scanner.py

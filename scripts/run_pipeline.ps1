@@ -21,7 +21,7 @@ if (-not (Test-Path $OutputDir)) {
 
 $useAiFlag = $UseAI.IsPresent
 
-python -m metahunter.cli `
+python src/metahunter/cli.py `
   --input-dir "$InputDir" `
   --output-dir "$OutputDir" `
   --log-path "$LogPath" `
