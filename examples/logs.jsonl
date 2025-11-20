@@ -1,0 +1,4 @@
+{"timestamp": "2025-11-20T22:36:05.238762Z", "run_id": "20251120T223605Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T22:36:05.239709Z", "run_id": "20251120T223605Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T22:36:05.245741Z", "run_id": "20251120T223605Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
+{"timestamp": "2025-11-20T22:36:05.246226Z", "run_id": "20251120T223605Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}
