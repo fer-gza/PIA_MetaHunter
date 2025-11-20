@@ -1,7 +1,7 @@
 import os
-from metahunter.cleaner import clean_file, hash_file
+from src.metahunter.cleaner import clean_file, hash_file
 
-CARPETA = r"C:\Users\Fer_g\Documents\PIA_MetaHunter\examples\sample_files"
+CARPETA = r"C:\Users\Kevin G\Documents\GitHub\PIA_MetaHunter\examples\sample_files"
 print(f"Limpieza de metadatos en: {CARPETA}\n")
 
 for archivo in os.listdir(CARPETA):
