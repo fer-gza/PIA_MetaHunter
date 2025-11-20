@@ -1,14 +1,24 @@
-import os
-from src.metahunter.cleaner import clean_file, hash_file
+import sys
+from pathlib import Path
 
-CARPETA = r"C:\Users\Kevin G\Documents\GitHub\PIA_MetaHunter\examples\sample_files"
-print(f"Limpieza de metadatos en: {CARPETA}\n")
+# Ruta raíz del repo y src/ para poder importar metahunter
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+sys.path.append(str(SRC))
 
-for archivo in os.listdir(CARPETA):
-    ruta = os.path.join(CARPETA, archivo)
-    if archivo.lower().endswith((".docx", ".pdf")):
-        hash_antes = hash_file(ruta)
-        clean_file(ruta)
-        print(f"✅ Limpieza completada: {archivo}")
-        print(f"🔐 Hash antes de limpieza: {hash_antes}")
+from metahunter.cleaner import clean_file
+
+INPUT_DIR = ROOT / "examples" / "sample_files"
+OUTPUT_DIR = ROOT / "examples" / "sample_files" / "cleaned"
+
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+print(f"Limpieza de metadatos en: {INPUT_DIR}\n")
+
+for path in INPUT_DIR.iterdir():
+    if path.is_file() and path.suffix.lower() in (".pdf", ".docx"):
+        out_path = OUTPUT_DIR / path.name
+        clean_file(path, out_path)
+        print(f"✅ Limpieza completada: {path.name}")
+        print(f"📄 Archivo limpio generado en: {out_path}")
         print("-" * 40)
