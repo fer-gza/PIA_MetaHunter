@@ -1,0 +1,19 @@
+{
+  "run_id": "20251120T230739Z",
+  "prompt_version": "v1",
+  "explicacion_riesgos": "Se analizaron 1 archivo(s). Se detectaron 1 PDF(s) y 0 DOCX(s). Los metadatos de estos archivos pueden revelar información sensible como autores, herramientas utilizadas o rutas internas.",
+  "sugerencias_reglas": [
+    "Revisar periódicamente los documentos antes de compartirlos externamente.",
+    "Estandarizar una política interna de limpieza de metadatos.",
+    "Priorizar la limpieza de documentos PDF y DOCX de uso público o que se publiquen en la web."
+  ],
+  "resumen_ejecutivo": "MetaHunter ejecutó una corrida con id 20251120T230739Z, limpiando metadatos de 1 archivo(s). Los resultados muestran que la herramienta está lista para usarse en entornos reales.",
+  "archivos_procesados": [
+    {
+      "input": "data\\raw\\test_extenso.pdf",
+      "output": "data\\clean\\test_extenso.pdf",
+      "extension": ".pdf"
+    }
+  ],
+  "generado_en": "2025-11-20T23:07:39.528711Z"
+}

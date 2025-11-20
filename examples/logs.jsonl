@@ -7,3 +7,33 @@
 {"timestamp": "2025-11-20T22:48:35.649467Z", "run_id": "20251120T224835Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
 {"timestamp": "2025-11-20T22:48:35.651127Z", "run_id": "20251120T224835Z", "module": "ai_client", "level": "INFO", "event": "ai_summary_generated", "details": {"output": "examples\\ai_summary_20251120T224835Z.json"}}
 {"timestamp": "2025-11-20T22:48:35.651566Z", "run_id": "20251120T224835Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}
+{"timestamp": "2025-11-20T22:51:12.374127Z", "run_id": "20251120T225112Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T22:51:12.374951Z", "run_id": "20251120T225112Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T22:51:12.380000Z", "run_id": "20251120T225112Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
+{"timestamp": "2025-11-20T22:51:12.381190Z", "run_id": "20251120T225112Z", "module": "ai_client", "level": "INFO", "event": "ai_summary_generated", "details": {"output": "examples\\ai_summary_20251120T225112Z.json"}}
+{"timestamp": "2025-11-20T22:51:12.381677Z", "run_id": "20251120T225112Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}
+{"timestamp": "2025-11-20T23:07:39.522435Z", "run_id": "20251120T230739Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T23:07:39.523256Z", "run_id": "20251120T230739Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T23:07:39.528118Z", "run_id": "20251120T230739Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
+{"timestamp": "2025-11-20T23:07:39.529137Z", "run_id": "20251120T230739Z", "module": "ai_client", "level": "INFO", "event": "ai_summary_generated", "details": {"output": "examples\\ai_summary_20251120T230739Z.json"}}
+{"timestamp": "2025-11-20T23:07:39.529603Z", "run_id": "20251120T230739Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}
+{"timestamp": "2025-11-20T23:07:56.338378Z", "run_id": "20251120T230756Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T23:07:56.339112Z", "run_id": "20251120T230756Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T23:07:56.344027Z", "run_id": "20251120T230756Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
+{"timestamp": "2025-11-20T23:07:56.345034Z", "run_id": "20251120T230756Z", "module": "ai_client", "level": "INFO", "event": "ai_summary_generated", "details": {"output": "examples\\ai_summary_20251120T230756Z.json"}}
+{"timestamp": "2025-11-20T23:07:56.345474Z", "run_id": "20251120T230756Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}
+{"timestamp": "2025-11-20T23:10:35.819367Z", "run_id": "20251120T231035Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T23:10:35.820202Z", "run_id": "20251120T231035Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T23:10:35.840896Z", "run_id": "20251120T231035Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
+{"timestamp": "2025-11-20T23:10:35.843373Z", "run_id": "20251120T231035Z", "module": "ai_client", "level": "INFO", "event": "ai_summary_generated", "details": {"output": "examples\\ai_summary_20251120T231035Z.json"}}
+{"timestamp": "2025-11-20T23:10:35.844581Z", "run_id": "20251120T231035Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}
+{"timestamp": "2025-11-20T23:16:32.539301Z", "run_id": "20251120T231632Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T23:16:32.540110Z", "run_id": "20251120T231632Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T23:17:57.275669Z", "run_id": "20251120T231757Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T23:17:57.276368Z", "run_id": "20251120T231757Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T23:18:32.074081Z", "run_id": "20251120T231832Z", "module": "cli", "level": "INFO", "event": "run_start", "details": {"input": "data\\raw", "output": "data\\clean", "use_ai": true}}
+{"timestamp": "2025-11-20T23:18:32.074788Z", "run_id": "20251120T231832Z", "module": "cli", "level": "INFO", "event": "scan_files", "details": {"total": 1}}
+{"timestamp": "2025-11-20T23:18:32.078365Z", "run_id": "20251120T231832Z", "module": "cleaner", "level": "INFO", "event": "file_cleaned", "details": {"input": "data\\raw\\test_extenso.pdf", "output": "data\\clean\\test_extenso.pdf", "extension": ".pdf"}}
+{"timestamp": "2025-11-20T23:18:32.079510Z", "run_id": "20251120T231832Z", "module": "ai_client", "level": "INFO", "event": "ai_summary_generated", "details": {"output": "examples\\ai_summary_20251120T231832Z.json"}}
+{"timestamp": "2025-11-20T23:18:32.080798Z", "run_id": "20251120T231832Z", "module": "ai_client", "level": "INFO", "event": "ai_report_generated", "details": {"output": "reports\\ai_report_20251120T231832Z.md"}}
+{"timestamp": "2025-11-20T23:18:32.081270Z", "run_id": "20251120T231832Z", "module": "cli", "level": "INFO", "event": "run_finished", "details": {"total": 1, "procesados": 1}}

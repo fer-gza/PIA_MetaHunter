@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from cleaner import clean_file               # IMPORT DIRECTO
-from ai_client import generate_ai_summary     # IMPORT DIRECTO
+from ai_client import generate_ai_summary, build_human_report     # IMPORT DIRECTO
 
 
 def log_event(log_path: Path, run_id: str, module: str, level: str, event: str, details: dict) -> None:
@@ -90,6 +90,99 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
 
     return 0
 
+def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool):
+    """
+    Ejecuta el pipeline completo:
+    1. Escanear archivos
+    2. Limpiar metadatos
+    3. Generar resumen con IA
+    4. Generar reporte escrito con IA
+    5. Registrar eventos en logs.jsonl
+    """
+
+    # --- Crear carpetas si no existen ---
+    output_dir.mkdir(parents=True, exist_ok=True)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # --- ID del run ---
+    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+
+    # --- Log inicio ---
+    log_event(
+        log_path, run_id, "cli", "INFO", "run_start",
+        {"input": str(input_dir), "output": str(output_dir), "use_ai": use_ai}
+    )
+
+    # --- Escaneo de archivos ---
+    files = list(input_dir.glob("*"))
+    log_event(
+        log_path, run_id, "cli", "INFO", "scan_files",
+        {"total": len(files)}
+    )
+
+    files_info = []
+
+    # --- Proceso de limpieza ---
+    for file in files:
+        cleaned_path = output_dir / file.name
+        extension = file.suffix.lower()
+
+        clean_file(file, cleaned_path)
+
+        files_info.append({
+            "input": str(file),
+            "output": str(cleaned_path),
+            "extension": extension
+        })
+
+        log_event(
+            log_path, run_id, "cleaner", "INFO", "file_cleaned",
+            {"input": str(file), "output": str(cleaned_path), "extension": extension}
+        )
+
+    # --- IA: análisis y reporte ---
+    if use_ai and files_info:
+        prompt_path = Path("prompts") / "prompt_v1.json"
+
+        # === Crear resumen IA (JSON estructurado) ===
+        summary = generate_ai_summary(run_id, files_info, prompt_path)
+
+        summary_path = Path("examples") / f"ai_summary_{run_id}.json"
+        summary_path.write_text(
+            json.dumps(summary, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+
+        log_event(
+            log_path, run_id, "ai_client", "INFO", "ai_summary_generated",
+            {"output": str(summary_path)}
+        )
+
+        # === Crear reporte escrito (Markdown) ===
+        report_path = Path("reports") / f"ai_report_{run_id}.md"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+
+        report_text = build_human_report(summary)
+        report_path.write_text(report_text, encoding="utf-8")
+
+        log_event(
+            log_path, run_id, "ai_client", "INFO", "ai_report_generated",
+            {"output": str(report_path)}
+        )
+
+    # --- Log final ---
+    log_event(
+        log_path, run_id, "cli", "INFO", "run_finished",
+        {"total": len(files), "procesados": len(files_info)}
+    )
+
+    print(f"\n✔ CORRIDA COMPLETA ({run_id})")
+    print(f"    Archivos procesados: {len(files_info)}")
+    if use_ai:
+        print(f"    → Resumen IA: {summary_path}")
+        print(f"    → Reporte IA: {report_path}")
+
+
 
 def main():
     args = parse_args()
@@ -104,3 +197,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

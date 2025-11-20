@@ -19,7 +19,8 @@ def generate_ai_summary(run_id: str, files_info: List[Dict[str, Any]], prompt_pa
     explicacion = (
         f"Se analizaron {total_archivos} archivo(s). "
         f"Se detectaron {len(pdfs)} PDF(s) y {len(docx)} DOCX(s). "
-        "Los metadatos de estos archivos pueden revelar información sensible como autores, herramientas utilizadas o rutas internas."
+        "Los metadatos de estos archivos pueden revelar información sensible como autores, "
+        "herramientas utilizadas o rutas internas."
     )
 
     sugerencias = [
@@ -43,3 +44,42 @@ def generate_ai_summary(run_id: str, files_info: List[Dict[str, Any]], prompt_pa
         "archivos_procesados": files_info,
         "generado_en": datetime.utcnow().isoformat() + "Z"
     }
+
+
+def build_human_report(summary: Dict[str, Any]) -> str:
+    """Genera un reporte en texto/markdown interpretando los datos del resumen de IA."""
+    lineas: List[str] = []
+
+    lineas.append("# Reporte de análisis de metadatos\n")
+    lineas.append(f"- Run ID: {summary.get('run_id', '')}")
+    lineas.append(f"- Versión de prompt: {summary.get('prompt_version', '')}")
+    lineas.append(f"- Generado en: {summary.get('generado_en', '')}")
+    lineas.append("")
+
+    lineas.append("## Resumen ejecutivo\n")
+    lineas.append(summary.get("resumen_ejecutivo", ""))
+    lineas.append("")
+
+    lineas.append("## Riesgos detectados\n")
+    lineas.append(summary.get("explicacion_riesgos", ""))
+    lineas.append("")
+
+    lineas.append("## Recomendaciones y reglas sugeridas\n")
+    for sug in summary.get("sugerencias_reglas", []):
+        lineas.append(f"- {sug}")
+    lineas.append("")
+
+    lineas.append("## Archivos procesados\n")
+    for info in summary.get("archivos_procesados", []):
+        lineas.append(
+            f"- Entrada: {info.get('input')}  →  Salida: {info.get('output')}  "
+            f"({info.get('extension')})"
+        )
+
+    lineas.append("")
+    lineas.append(
+        "Este reporte fue generado automáticamente por el módulo de IA de MetaHunter "
+        "a partir de los datos de la corrida."
+    )
+
+    return "\n".join(lineas)
