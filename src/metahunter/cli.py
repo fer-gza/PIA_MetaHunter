@@ -7,7 +7,6 @@ from pathlib import Path
 from metahunter.cleaner import clean_file
 from metahunter.ai_client import generate_ai_summary, build_human_report
 from metahunter.analyzer import analyze_files
-from metahunter.sensitive_detector import detect_sensitive_for_files
 
 
 def log_event(log_path: Path, run_id: str, module: str, level: str, event: str, details: dict) -> None:
@@ -40,10 +39,9 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
     """
     Pipeline completo:
     1. Escaneo de archivos
-    2. Limpieza de metadatos
-    3. Análisis técnico (tarea 3)
-    4. Detector de información sensible (tarea 4)
-    5. Análisis por IA + reporte (tarea 2)
+    2. Limpieza de metadatos (tarea 1)
+    3. Análisis técnico (tarea 2)
+    4. Análisis por IA + reporte (tarea 3)
     """
 
     if not input_dir.exists():
@@ -75,6 +73,7 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
             out_path = output_dir / f.name
             out_path.write_bytes(f.read_bytes())
 
+            # limpia metadatos al archivo de salida
             clean_file(f, out_path)
 
             info = {
@@ -96,7 +95,7 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
 
     cleaned_paths = [Path(info["output"]) for info in files_info]
 
-    # 3) Análisis técnico (tarea 3)
+    # 3) Análisis técnico (tarea 2)
     try:
         stats = analyze_files(cleaned_paths)
         stats_path = Path("examples") / f"stats_{run_id}.json"
@@ -115,26 +114,7 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
             {"error": str(e)}
         )
 
-    # 4) Detector de información sensible (tarea 4)
-    try:
-        sensitive = detect_sensitive_for_files(cleaned_paths)
-        sensitive_path = Path("examples") / f"sensitive_{run_id}.json"
-        sensitive_path.parent.mkdir(parents=True, exist_ok=True)
-        sensitive_path.write_text(
-            json.dumps(sensitive, ensure_ascii=False, indent=2),
-            encoding="utf-8"
-        )
-        log_event(
-            log_path, run_id, "sensitive_detector", "INFO", "sensitive_scan_completed",
-            {"output": str(sensitive_path), "files": len(sensitive)}
-        )
-    except Exception as e:
-        log_event(
-            log_path, run_id, "sensitive_detector", "ERROR", "sensitive_error",
-            {"error": str(e)}
-        )
-
-    # 5) IA: resumen + reporte (tarea 2)
+    # 4) IA: resumen + reporte (tarea 3)
     summary_path = None
     report_path = None
 
@@ -173,7 +153,6 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
     print(f"\n✔ CORRIDA COMPLETA ({run_id})")
     print(f"   Archivos procesados: {len(files_info)}")
     print(f"   Stats técnicos: examples/stats_{run_id}.json")
-    print(f"   Escaneo sensible: examples/sensitive_{run_id}.json")
     if use_ai and summary_path and report_path:
         print(f"   Resumen IA: {summary_path}")
         print(f"   Reporte IA: {report_path}")
