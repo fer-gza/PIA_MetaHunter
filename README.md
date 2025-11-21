@@ -1,51 +1,232 @@
 # 🧠 MetaHunter  
-### Escáner y limpiador inteligente de metadatos
-### Fernando Garza Chávez
-### Kevin Daniel Grimaldo Esquivel
-### Alejandro Martínez Moya
+## Escáner, limpiador y analizador inteligente de metadatos  
+### Fernando Garza Chávez  
+### Kevin Daniel Grimaldo Esquivel  
+### Alejandro Martínez Moya  
 
 ---
 
-## 📋 Descripción general
+# 📘 Descripción general
 
-**MetaHunter** es una herramienta multiplataforma desarrollada con **Python, Bash y PowerShell** que permite **detectar y eliminar metadatos sensibles** de archivos corporativos antes de compartirlos o publicarlos.
+**MetaHunter** es una herramienta multiplataforma desarrollada en **Python + PowerShell + Bash** que automatiza el procesamiento de archivos para:
 
-Su propósito es **proteger la privacidad y la información confidencial** de la empresa, evitando que documentos, imágenes o reportes contengan datos ocultos como nombres de autor, ubicación GPS, software usado, fechas de creación o rutas internas del sistema.
+- Detectar y eliminar metadatos ocultos.
+- Analizar archivos técnicamente (tamaño, tipo, hash).
+- Generar resúmenes automáticos con Inteligencia Artificial.
+- Crear un reporte técnico final en formato Markdown.
+- Registrar toda la ejecución en logs JSONL estructurados.
 
----
-
-## 🚀 Funcionalidades principales
-
-- 🔍 **Escaneo de metadatos** en formatos comunes:  
-  - Imágenes (`.jpg`, `.png`)  
-  - Documentos (`.pdf`, `.docx`)  
-  - Archivos de texto (`.txt`, `.md`)
-
-- 🧹 **Limpieza automática** de información sensible.
-
-- 🧾 **Generación de reportes** en formato **Markdown o HTML**, con:
-  - Archivos analizados  
-  - Metadatos encontrados  
-  - Acciones realizadas  
-
-- ⚙️ **Integración con scripts Bash o PowerShell** para automatizar el proceso.
-
-- 🔒 **Validación post-limpieza** para asegurar que los metadatos fueron completamente eliminados.
+El objetivo es proteger la privacidad, facilitar auditorías digitales y automatizar procesos críticos en el tratamiento de documentos corporativos.
 
 ---
 
-## 🧩 Tecnologías utilizadas
+# 🚀 Funcionalidades principales
 
-| Tecnología | Uso principal |
-|-------------|----------------|
-| **Python 3** | Análisis y limpieza de metadatos |
-| **ExifTool / Pillow / PyPDF2** | Lectura y manipulación de metadatos |
-| **Bash / PowerShell** | Automatización y ejecución masiva |
-| **Markdown / HTML** | Reportes técnicos automatizados |
-| **GitHub** | Control de versiones y documentación |
+### 🧹 1. Limpieza de metadatos — `cleaner.py`
+- Elimina metadatos EXIF, XMP, IPTC y propiedades internas.
+- Compatible con: **PDF, DOCX, JPG, PNG**.
+- Genera hash pre y post limpieza para validar integridad.
 
 ---
 
-📦 Estado del proyecto
+### 📊 2. Análisis técnico — `analyzer.py`
+Calcula:
 
-✅ Módulo `cleaner.py` funcional en `/src/metahunter`
+- Tamaño exacto por archivo  
+- Hash SHA-256  
+- Tipo MIME  
+- Extensión  
+- Conteo básico de contenido (TXT/MD)  
+- Resumen técnico global
+
+El resultado se guarda en:
+
+📄 `examples/stats_<run_id>.json`
+
+---
+
+### 🤖 3. Inteligencia Artificial — `ai_client.py`
+La IA se utiliza para:
+
+- Resumir lo realizado por el pipeline.  
+- Describir archivos, riesgos, cambios y limpieza.  
+- Generar un reporte detallado en Markdown.
+
+Resultados:
+
+📘 `examples/ai_summary_<run_id>.json`  
+📑 `reports/ai_report_<run_id>.md`
+
+---
+
+### 🔗 4. Pipeline técnico completo — `cli.py`
+Integra todas las tareas:
+
+1. Escaneo de archivos  
+2. Limpieza  
+3. Análisis técnico  
+4. IA (opcional)  
+5. Logging estructurado  
+6. Exportación de reportes
+
+---
+
+### ⚙️ 5. Scripts de orquestación
+
+| Script | Uso |
+|--------|------|
+| `scripts/run_pipeline.ps1` | Ejecutar todo el pipeline en Windows |
+| `scripts/run_pipeline.sh` | Ejecutar en Linux/Mac |
+| `metahunter` (entry point global) | Ejecutar desde cualquier computadora sin rutas |
+
+---
+
+# 📁 Estructura del proyecto
+
+```
+PIA_MetaHunter/
+│
+├── src/
+│   └── metahunter/
+│       ├── cleaner.py
+│       ├── analyzer.py
+│       ├── ai_client.py
+│       ├── cli.py
+│       ├── __main__.py
+│       └── __init__.py
+│
+├── prompts/
+│   └── prompt_v1.json
+│
+├── examples/
+│   ├── logs.jsonl
+│   ├── stats_*.json
+│   └── ai_summary_*.json
+│
+├── reports/
+│   └── ai_report_*.md
+│
+├── docs/
+│   ├── ai_plan.md
+│   └── entregable_4.md
+│
+├── scripts/
+│   ├── run_pipeline.ps1
+│   └── run_pipeline.sh
+│
+├── data/
+│   ├── raw/
+│   └── clean/
+│
+└── README.md
+```
+
+---
+
+# 🔧 Instalación
+
+### 📌 Instalar como paquete global
+
+```
+pip install -e .
+```
+
+Esto crea el comando:
+
+```
+metahunter
+```
+
+---
+
+# ▶️ Uso del programa
+
+### 🔵 Ejecutar sin entorno virtual
+
+```
+metahunter --input-dir data/raw --output-dir data/clean --log-path examples/logs.jsonl --use-ai
+```
+
+---
+
+### 🔵 Ejecutar dentro de un venv
+
+```
+python -m metahunter.cli --input-dir data/raw --output-dir data/clean --log-path examples/logs.jsonl --use-ai
+```
+
+---
+
+### 🔵 PowerShell
+
+```
+.\scripts
+un_pipeline.ps1
+```
+
+### 🔵 Bash
+
+```
+./scripts/run_pipeline.sh
+```
+
+---
+
+# 📝 Ejemplos de salida
+
+### ✔ Archivo limpio:
+```
+data/clean/test.pdf
+```
+
+---
+
+### ✔ Logs estructurados
+`examples/logs.jsonl`
+
+Ejemplo real:
+
+```json
+{
+  "timestamp": "2025-11-20T22:51:12Z",
+  "run_id": "20251120T225112Z",
+  "module": "cleaner",
+  "level": "INFO",
+  "event": "file_cleaned",
+  "details": {
+    "input": "data/raw/test.pdf",
+    "output": "data/clean/test.pdf"
+  }
+}
+```
+
+---
+
+# 📑 Documentación incluida
+
+📘 `/docs/ai_plan.md` → Plan formal de integración de IA  
+📗 `/docs/entregable_4.md` → Avance para el cuarto entregable  
+
+---
+
+# 🔥 Estado actual del proyecto — Entregable 4
+
+| Requisito | Estado |
+|----------|---------|
+| Mínimo dos tareas funcionales | ✔ cleaner + analyzer |
+| IA integrada | ✔ ai_client funcionando |
+| Pipeline técnico consolidado | ✔ cli.py completo |
+| Evidencia reproducible | ✔ examples/ y reports/ |
+| Logging estructurado | ✔ logs.jsonl |
+| prompts/ creado | ✔ prompt_v1.json |
+| Orquestación (PS1 / SH) | ✔ scripts |
+| Lectura y ejecución global | ✔ `pip install -e .` |
+| README actualizado | ✔ Completo |
+
+---
+
+# 👥 Autores
+
+**Fernando Garza Chávez**  
+**Kevin Daniel Grimaldo Esquivel**  
+**Alejandro Martínez Moya**
