@@ -14,14 +14,8 @@ readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
 
-# === Dependencias principales ===
 dependencies = [
-    # Core
-    "pathlib",
-    "argparse",
-    "datetime",
-    "hashlib",
-    "os-sys",
+    # Tipos
     "typing-extensions",
 
     # Documentos (Office / PDF)
@@ -41,16 +35,17 @@ dependencies = [
     "rich>=13.7.0",
     "colorama>=0.4.6",
     "tabulate>=0.9.0",
-
-    # Desarrollo y pruebas
-    "pytest>=7.4.2",
-    "flake8>=6.1.0",
-    "black>=24.4.0"
 ]
 
-# === Entry point para ejecutar el programa ===
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.2",
+    "flake8>=6.1.0",
+    "black>=24.4.0",
+]
+
 [project.scripts]
-metahunter = "metahunter.__main__:main"
+metahunter = "metahunter.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

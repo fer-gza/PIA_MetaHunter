@@ -4,8 +4,10 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from cleaner import clean_file               # IMPORT DIRECTO
-from ai_client import generate_ai_summary, build_human_report     # IMPORT DIRECTO
+from metahunter.cleaner import clean_file
+from metahunter.ai_client import generate_ai_summary, build_human_report
+from metahunter.analyzer import analyze_files
+from metahunter.sensitive_detector import detect_sensitive_for_files
 
 
 def log_event(log_path: Path, run_id: str, module: str, level: str, event: str, details: dict) -> None:
@@ -25,7 +27,7 @@ def log_event(log_path: Path, run_id: str, module: str, level: str, event: str, 
 def parse_args():
     p = argparse.ArgumentParser(
         prog="metahunter",
-        description="Pipeline de escaneo, limpieza de metadatos y resumen con IA."
+        description="Pipeline de escaneo, limpieza de metadatos, análisis técnico e IA."
     )
     p.add_argument("--input-dir", required=True, type=Path)
     p.add_argument("--output-dir", required=True, type=Path)
@@ -34,31 +36,46 @@ def parse_args():
     return p.parse_args()
 
 
-def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool) -> int:
-    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool):
+    """
+    Pipeline completo:
+    1. Escaneo de archivos
+    2. Limpieza de metadatos
+    3. Análisis técnico (tarea 3)
+    4. Detector de información sensible (tarea 4)
+    5. Análisis por IA + reporte (tarea 2)
+    """
 
     if not input_dir.exists():
         raise FileNotFoundError(f"El directorio de entrada no existe: {input_dir}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    log_event(log_path, run_id, "cli", "INFO", "run_start",
-              {"input": str(input_dir), "output": str(output_dir), "use_ai": use_ai})
+    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+
+    log_event(
+        log_path, run_id, "cli", "INFO", "run_start",
+        {"input": str(input_dir), "output": str(output_dir), "use_ai": use_ai}
+    )
 
     supported = {".jpg", ".jpeg", ".png", ".pdf", ".docx", ".txt", ".md"}
     files = [p for p in input_dir.rglob("*") if p.is_file() and p.suffix.lower() in supported]
 
-    log_event(log_path, run_id, "cli", "INFO", "scan_files", {"total": len(files)})
+    log_event(
+        log_path, run_id, "cli", "INFO", "scan_files",
+        {"total": len(files)}
+    )
 
-    processed = 0
     files_info = []
 
+    # 1-2) Limpieza de archivos
     for f in files:
         try:
             out_path = output_dir / f.name
             out_path.write_bytes(f.read_bytes())
 
-            clean_file(str(out_path))  # <<< LIMPIEZA
+            clean_file(f, out_path)
 
             info = {
                 "input": str(f),
@@ -67,84 +84,63 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
             }
             files_info.append(info)
 
-            log_event(log_path, run_id, "cleaner", "INFO", "file_cleaned", info)
-            processed += 1
-
+            log_event(
+                log_path, run_id, "cleaner", "INFO", "file_cleaned",
+                info
+            )
         except Exception as e:
-            log_event(log_path, run_id, "cleaner", "ERROR", "file_error",
-                      {"input": str(f), "error": str(e)})
+            log_event(
+                log_path, run_id, "cleaner", "ERROR", "file_error",
+                {"input": str(f), "error": str(e)}
+            )
 
-    if use_ai and files_info:
-        prompt_path = Path("prompts") / "prompt_v1.json"
+    cleaned_paths = [Path(info["output"]) for info in files_info]
 
-        summary = generate_ai_summary(run_id, files_info, prompt_path)
-
-        ai_output_path = Path("examples") / f"ai_summary_{run_id}.json"
-        ai_output_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-
-        log_event(log_path, run_id, "ai_client", "INFO", "ai_summary_generated",
-                  {"output": str(ai_output_path)})
-
-    log_event(log_path, run_id, "cli", "INFO", "run_finished",
-              {"total": len(files), "procesados": processed})
-
-    return 0
-
-def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool):
-    """
-    Ejecuta el pipeline completo:
-    1. Escanear archivos
-    2. Limpiar metadatos
-    3. Generar resumen con IA
-    4. Generar reporte escrito con IA
-    5. Registrar eventos en logs.jsonl
-    """
-
-    # --- Crear carpetas si no existen ---
-    output_dir.mkdir(parents=True, exist_ok=True)
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-
-    # --- ID del run ---
-    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-
-    # --- Log inicio ---
-    log_event(
-        log_path, run_id, "cli", "INFO", "run_start",
-        {"input": str(input_dir), "output": str(output_dir), "use_ai": use_ai}
-    )
-
-    # --- Escaneo de archivos ---
-    files = list(input_dir.glob("*"))
-    log_event(
-        log_path, run_id, "cli", "INFO", "scan_files",
-        {"total": len(files)}
-    )
-
-    files_info = []
-
-    # --- Proceso de limpieza ---
-    for file in files:
-        cleaned_path = output_dir / file.name
-        extension = file.suffix.lower()
-
-        clean_file(file, cleaned_path)
-
-        files_info.append({
-            "input": str(file),
-            "output": str(cleaned_path),
-            "extension": extension
-        })
-
+    # 3) Análisis técnico (tarea 3)
+    try:
+        stats = analyze_files(cleaned_paths)
+        stats_path = Path("examples") / f"stats_{run_id}.json"
+        stats_path.parent.mkdir(parents=True, exist_ok=True)
+        stats_path.write_text(
+            json.dumps(stats, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
         log_event(
-            log_path, run_id, "cleaner", "INFO", "file_cleaned",
-            {"input": str(file), "output": str(cleaned_path), "extension": extension}
+            log_path, run_id, "analyzer", "INFO", "stats_generated",
+            {"output": str(stats_path), "files": len(stats)}
+        )
+    except Exception as e:
+        log_event(
+            log_path, run_id, "analyzer", "ERROR", "stats_error",
+            {"error": str(e)}
         )
 
-    # --- IA: análisis y reporte ---
+    # 4) Detector de información sensible (tarea 4)
+    try:
+        sensitive = detect_sensitive_for_files(cleaned_paths)
+        sensitive_path = Path("examples") / f"sensitive_{run_id}.json"
+        sensitive_path.parent.mkdir(parents=True, exist_ok=True)
+        sensitive_path.write_text(
+            json.dumps(sensitive, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+        log_event(
+            log_path, run_id, "sensitive_detector", "INFO", "sensitive_scan_completed",
+            {"output": str(sensitive_path), "files": len(sensitive)}
+        )
+    except Exception as e:
+        log_event(
+            log_path, run_id, "sensitive_detector", "ERROR", "sensitive_error",
+            {"error": str(e)}
+        )
+
+    # 5) IA: resumen + reporte (tarea 2)
+    summary_path = None
+    report_path = None
+
     if use_ai and files_info:
         prompt_path = Path("prompts") / "prompt_v1.json"
 
-        # === Crear resumen IA (JSON estructurado) ===
         summary = generate_ai_summary(run_id, files_info, prompt_path)
 
         summary_path = Path("examples") / f"ai_summary_{run_id}.json"
@@ -158,7 +154,6 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
             {"output": str(summary_path)}
         )
 
-        # === Crear reporte escrito (Markdown) ===
         report_path = Path("reports") / f"ai_report_{run_id}.md"
         report_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -170,31 +165,28 @@ def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool
             {"output": str(report_path)}
         )
 
-    # --- Log final ---
     log_event(
         log_path, run_id, "cli", "INFO", "run_finished",
         {"total": len(files), "procesados": len(files_info)}
     )
 
     print(f"\n✔ CORRIDA COMPLETA ({run_id})")
-    print(f"    Archivos procesados: {len(files_info)}")
-    if use_ai:
-        print(f"    → Resumen IA: {summary_path}")
-        print(f"    → Reporte IA: {report_path}")
-
+    print(f"   Archivos procesados: {len(files_info)}")
+    print(f"   Stats técnicos: examples/stats_{run_id}.json")
+    print(f"   Escaneo sensible: examples/sensitive_{run_id}.json")
+    if use_ai and summary_path and report_path:
+        print(f"   Resumen IA: {summary_path}")
+        print(f"   Reporte IA: {report_path}")
 
 
 def main():
     args = parse_args()
     try:
-        exit_code = run_pipeline(args.input_dir, args.output_dir, args.log_path, args.use_ai)
+        run_pipeline(args.input_dir, args.output_dir, args.log_path, args.use_ai)
     except Exception as e:
         print(f"[ERROR] {e}", file=sys.stderr)
         sys.exit(1)
 
-    sys.exit(exit_code)
-
 
 if __name__ == "__main__":
     main()
-
