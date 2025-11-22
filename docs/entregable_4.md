@@ -8,7 +8,7 @@ Consolidar el flujo técnico del proyecto, validar la integración de IA, produc
 ## 🧩 Componentes completados
 - Limpieza de metadatos (**Tarea 1**)
 - Análisis técnico (**Tarea 2**)
-- Integración de IA con resumen y reporte (**Tarea 3**)
+- Integración de IA con resumen y reporte
 - Logging estructurado en JSONL
 - Documentación formal
 - Scripts PS1 y SH de orquestación
