@@ -107,7 +107,8 @@ PIA_MetaHunter/
 ## ✔ 3. Script de orquestación
 
 ```
-.\scriptsun_pipeline.ps1 -InputDir "data/raw" -OutputDir "data/clean"
+.\scripts
+un_pipeline.ps1 -InputDir "data/raw" -OutputDir "data/clean"
 ```
 
 Automatiza:
@@ -194,7 +195,8 @@ python -m metahunter.cli --input-dir data/raw --output-dir data/clean --log-path
 ### 2. Usando PowerShell
 
 ```
-.\scriptsun_pipeline.ps1
+.\scripts
+un_pipeline.ps1
 ```
 
 ---
