@@ -1,170 +1,329 @@
+from __future__ import annotations
+
 import argparse
 import json
-import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Dict, List
 
-from metahunter.cleaner import clean_file
-from metahunter.ai_client import generate_ai_summary, build_human_report
-from metahunter.analyzer import analyze_files
+from . import cleaner
+from . import analyzer
+from . import ai_client  # Asegúrate de que exista este módulo
+from .integrity import build_integrity_report
 
 
-def log_event(log_path: Path, run_id: str, module: str, level: str, event: str, details: dict) -> None:
+# ---------------------------------------------------------------------------
+# Utilidad para logging JSONL
+# ---------------------------------------------------------------------------
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def log_event(
+    log_path: Path,
+    run_id: str,
+    module: str,
+    level: str,
+    event: str,
+    details: Dict | None = None,
+) -> None:
     record = {
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": _now_iso(),
         "run_id": run_id,
         "module": module,
         "level": level,
         "event": event,
-        "details": details,
+        "details": details or {},
     }
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
-def parse_args():
-    p = argparse.ArgumentParser(
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
         prog="metahunter",
-        description="Pipeline de escaneo, limpieza de metadatos, análisis técnico e IA."
+        description="MetaHunter - Escáner, limpiador y analizador inteligente de metadatos.",
     )
-    p.add_argument("--input-dir", required=True, type=Path)
-    p.add_argument("--output-dir", required=True, type=Path)
-    p.add_argument("--log-path", required=True, type=Path)
-    p.add_argument("--use-ai", action="store_true")
-    return p.parse_args()
+
+    parser.add_argument(
+        "--input-dir",
+        type=Path,
+        required=True,
+        help="Carpeta de entrada con archivos RAW a procesar.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        required=True,
+        help="Carpeta donde se guardarán los archivos limpios.",
+    )
+    parser.add_argument(
+        "--log-path",
+        type=Path,
+        required=True,
+        help="Ruta al archivo JSONL de logs (por ejemplo: examples/logs.jsonl).",
+    )
+    parser.add_argument(
+        "--use-ai",
+        action="store_true",
+        help="Si se activa, ejecuta la integración con IA (ai_client.py).",
+    )
+    parser.add_argument(
+        "--stats-path",
+        type=Path,
+        help="Ruta del JSON con estadísticas (por defecto: examples/stats_<run_id>.json).",
+    )
+    parser.add_argument(
+        "--ai-summary-path",
+        type=Path,
+        help="Ruta del JSON con el resumen de IA (por defecto: examples/ai_summary_<run_id>.json).",
+    )
+    parser.add_argument(
+        "--ai-report-path",
+        type=Path,
+        help="Ruta del reporte Markdown generado por IA (por defecto: reports/ai_report_<run_id>.md).",
+    )
+    parser.add_argument(
+        "--integrity-report",
+        dest="integrity_report_path",
+        type=Path,
+        help="Ruta de un JSON donde se guardará el reporte de integridad (Merkle root).",
+    )
+
+    return parser.parse_args()
 
 
-def run_pipeline(input_dir: Path, output_dir: Path, log_path: Path, use_ai: bool):
+def _collect_input_files(input_dir: Path) -> List[Path]:
     """
-    Pipeline completo:
-    1. Escaneo de archivos
-    2. Limpieza de metadatos (tarea 1)
-    3. Análisis técnico (tarea 2)
-    4. Análisis por IA + reporte (tarea 3)
+    Devuelve lista de archivos dentro de input_dir (no recursivo).
+    Si quieres recursivo, cambia a rglob('*').
     """
+    return [p for p in input_dir.iterdir() if p.is_file()]
 
-    if not input_dir.exists():
-        raise FileNotFoundError(f"El directorio de entrada no existe: {input_dir}")
+
+def run_pipeline(
+    input_dir: Path,
+    output_dir: Path,
+    log_path: Path,
+    use_ai: bool,
+    stats_path: Path | None = None,
+    ai_summary_path: Path | None = None,
+    ai_report_path: Path | None = None,
+    integrity_report_path: Path | None = None,
+) -> None:
+    # Generar run_id tipo 20251120T225112Z
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+    # Defaults de rutas según patrón del README
+    if stats_path is None:
+        stats_path = Path("examples") / f"stats_{run_id}.json"
+    if ai_summary_path is None:
+        ai_summary_path = Path("examples") / f"ai_summary_{run_id}.json"
+    if ai_report_path is None:
+        ai_report_path = Path("reports") / f"ai_report_{run_id}.md"
+
+    input_dir = input_dir.resolve()
+    output_dir = output_dir.resolve()
+    log_path = log_path.resolve()
+    stats_path = stats_path.resolve()
+    ai_summary_path = ai_summary_path.resolve()
+    ai_report_path = ai_report_path.resolve()
+    if integrity_report_path is not None:
+        integrity_report_path = integrity_report_path.resolve()
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-
-    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
 
     log_event(
-        log_path, run_id, "cli", "INFO", "run_start",
-        {"input": str(input_dir), "output": str(output_dir), "use_ai": use_ai}
+        log_path,
+        run_id,
+        "cli",
+        "INFO",
+        "run_started",
+        {
+            "input_dir": str(input_dir),
+            "output_dir": str(output_dir),
+            "use_ai": use_ai,
+        },
     )
 
-    supported = {".jpg", ".jpeg", ".png", ".pdf", ".docx", ".txt", ".md"}
-    files = [p for p in input_dir.rglob("*") if p.is_file() and p.suffix.lower() in supported]
+    files = _collect_input_files(input_dir)
+    if not files:
+        log_event(
+            log_path,
+            run_id,
+            "cli",
+            "WARNING",
+            "no_input_files",
+            {"input_dir": str(input_dir)},
+        )
+        print(f"[MetaHunter] No se encontraron archivos en {input_dir}")
+        return
 
-    log_event(
-        log_path, run_id, "cli", "INFO", "scan_files",
-        {"total": len(files)}
-    )
+    # -----------------------------------------------------------------------
+    # 1) Limpieza de metadatos + cálculo de hashes limpios
+    # -----------------------------------------------------------------------
+    clean_files: List[Path] = []
+    processed_hashes: Dict[str, str] = {}
 
-    files_info = []
-
-    # 1-2) Limpieza de archivos
     for f in files:
+        out_path = output_dir / f.name
+
         try:
-            out_path = output_dir / f.name
-            out_path.write_bytes(f.read_bytes())
+            # Se asume que cleaner.clean_file existe y limpia metadatos
+            cleaner.clean_file(f, out_path)
 
-            # limpia metadatos al archivo de salida
-            clean_file(f, out_path)
-
-            info = {
-                "input": str(f),
-                "output": str(out_path),
-                "extension": f.suffix.lower(),
-            }
-            files_info.append(info)
+            # Después de limpiar, dejamos que analyzer recalcule el hash SHA-256
+            clean_files.append(out_path)
 
             log_event(
-                log_path, run_id, "cleaner", "INFO", "file_cleaned",
-                info
+                log_path,
+                run_id,
+                "cleaner",
+                "INFO",
+                "file_cleaned",
+                {"input": str(f), "output": str(out_path)},
             )
-        except Exception as e:
+            print(f"[cleaner] OK  {f} -> {out_path}")
+        except Exception as e:  # noqa: BLE001
             log_event(
-                log_path, run_id, "cleaner", "ERROR", "file_error",
-                {"input": str(f), "error": str(e)}
+                log_path,
+                run_id,
+                "cleaner",
+                "ERROR",
+                "file_clean_error",
+                {"input": str(f), "error": str(e)},
             )
+            print(f"[cleaner] ERR {f}: {e}")
 
-    cleaned_paths = [Path(info["output"]) for info in files_info]
-
-    # 3) Análisis técnico (tarea 2)
-    try:
-        stats = analyze_files(cleaned_paths)
-        stats_path = Path("examples") / f"stats_{run_id}.json"
-        stats_path.parent.mkdir(parents=True, exist_ok=True)
-        stats_path.write_text(
-            json.dumps(stats, ensure_ascii=False, indent=2),
-            encoding="utf-8"
-        )
-        log_event(
-            log_path, run_id, "analyzer", "INFO", "stats_generated",
-            {"output": str(stats_path), "files": len(stats)}
-        )
-    except Exception as e:
-        log_event(
-            log_path, run_id, "analyzer", "ERROR", "stats_error",
-            {"error": str(e)}
-        )
-
-    # 4) IA: resumen + reporte (tarea 3)
-    summary_path = None
-    report_path = None
-
-    if use_ai and files_info:
-        prompt_path = Path("prompts") / "prompt_v1.json"
-
-        summary = generate_ai_summary(run_id, files_info, prompt_path)
-
-        summary_path = Path("examples") / f"ai_summary_{run_id}.json"
-        summary_path.write_text(
-            json.dumps(summary, ensure_ascii=False, indent=2),
-            encoding="utf-8"
-        )
-
-        log_event(
-            log_path, run_id, "ai_client", "INFO", "ai_summary_generated",
-            {"output": str(summary_path)}
-        )
-
-        report_path = Path("reports") / f"ai_report_{run_id}.md"
-        report_path.parent.mkdir(parents=True, exist_ok=True)
-
-        report_text = build_human_report(summary)
-        report_path.write_text(report_text, encoding="utf-8")
-
-        log_event(
-            log_path, run_id, "ai_client", "INFO", "ai_report_generated",
-            {"output": str(report_path)}
-        )
+    # -----------------------------------------------------------------------
+    # 2) Análisis técnico + avanzado (riesgo, forense, IA-heurstica)
+    # -----------------------------------------------------------------------
+    stats = analyzer.analyze_files(clean_files)
+    analyzer.save_stats(stats, stats_path)
 
     log_event(
-        log_path, run_id, "cli", "INFO", "run_finished",
-        {"total": len(files), "procesados": len(files_info)}
+        log_path,
+        run_id,
+        "analyzer",
+        "INFO",
+        "stats_saved",
+        {"output": str(stats_path), "files": len(stats)},
     )
+    print(f"[analyzer] Stats guardadas en {stats_path}")
 
-    print(f"\n✔ CORRIDA COMPLETA ({run_id})")
-    print(f"   Archivos procesados: {len(files_info)}")
-    print(f"   Stats técnicos: examples/stats_{run_id}.json")
-    if use_ai and summary_path and report_path:
-        print(f"   Resumen IA: {summary_path}")
-        print(f"   Reporte IA: {report_path}")
+    # Para el reporte de integridad, sacamos los hashes limpios del dict stats
+    for file_path, info in stats.items():
+        sha256 = info.get("sha256")
+        if sha256:
+            processed_hashes[file_path] = sha256
+
+    # -----------------------------------------------------------------------
+    # 3) IA (opcional) - resumen + reporte Markdown
+    # -----------------------------------------------------------------------
+    if use_ai:
+        try:
+            # Asegúrate de que ai_client tenga esta función o ajusta el nombre
+            ai_client.run_ai_pipeline(
+                stats_path=stats_path,
+                summary_path=ai_summary_path,
+                report_path=ai_report_path,
+                run_id=run_id,
+                log_path=log_path,
+            )
+
+            log_event(
+                log_path,
+                run_id,
+                "ai_client",
+                "INFO",
+                "ai_pipeline_finished",
+                {
+                    "stats_path": str(stats_path),
+                    "summary_path": str(ai_summary_path),
+                    "report_path": str(ai_report_path),
+                },
+            )
+            print(f"[ai_client] Resumen IA en {ai_summary_path}")
+            print(f"[ai_client] Reporte IA en {ai_report_path}")
+        except Exception as e:  # noqa: BLE001
+            log_event(
+                log_path,
+                run_id,
+                "ai_client",
+                "ERROR",
+                "ai_pipeline_error",
+                {"error": str(e)},
+            )
+            print(f"[ai_client] ERROR ejecutando IA: {e}")
+
+    # -----------------------------------------------------------------------
+    # 4) Reporte de integridad (Merkle root)
+    # -----------------------------------------------------------------------
+    if integrity_report_path is not None and processed_hashes:
+        try:
+            integrity_report = build_integrity_report(processed_hashes)
+            integrity_report_path.parent.mkdir(parents=True, exist_ok=True)
+            integrity_report_path.write_text(
+                json.dumps(integrity_report.to_dict(), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            log_event(
+                log_path,
+                run_id,
+                "cli",
+                "INFO",
+                "integrity_report_generated",
+                {
+                    "output": str(integrity_report_path),
+                    "files": len(processed_hashes),
+                    "algorithm": integrity_report.algorithm,
+                },
+            )
+            print(f"[integrity] Reporte de integridad: {integrity_report_path}")
+        except Exception as e:  # noqa: BLE001
+            log_event(
+                log_path,
+                run_id,
+                "cli",
+                "ERROR",
+                "integrity_report_error",
+                {"error": str(e)},
+            )
+            print(f"[integrity] ERROR generando reporte de integridad: {e}")
+
+    # -----------------------------------------------------------------------
+    # 5) Fin de ejecución
+    # -----------------------------------------------------------------------
+    log_event(
+        log_path,
+        run_id,
+        "cli",
+        "INFO",
+        "run_finished",
+        {"files_processed": len(clean_files)},
+    )
+    print(f"[MetaHunter] Ejecución completada. Archivos procesados: {len(clean_files)}")
 
 
-def main():
+def main() -> None:
     args = parse_args()
-    try:
-        run_pipeline(args.input_dir, args.output_dir, args.log_path, args.use_ai)
-    except Exception as e:
-        print(f"[ERROR] {e}", file=sys.stderr)
-        sys.exit(1)
+    run_pipeline(
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        log_path=args.log_path,
+        use_ai=args.use_ai,
+        stats_path=args.stats_path,
+        ai_summary_path=args.ai_summary_path,
+        ai_report_path=args.ai_report_path,
+        integrity_report_path=args.integrity_report_path,
+    )
 
 
 if __name__ == "__main__":

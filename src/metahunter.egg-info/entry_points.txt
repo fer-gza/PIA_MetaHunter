@@ -1,0 +1,2 @@
+[console_scripts]
+metahunter = metahunter.cli:main
