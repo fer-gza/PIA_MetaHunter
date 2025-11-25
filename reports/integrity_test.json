@@ -1,0 +1,30 @@
+{
+  "algorithm": "SHA-256",
+  "merkle_root": "e6b8c200d414787d1f16c99127de453d3456d9f1158d725c4e4a208e7cfc600a",
+  "files": [
+    {
+      "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\clean\\contrato_fix.pdf",
+      "hash": "c0c3e735b2278c1afbc248a798c6d3e4e2064a4580d353d230647042e04cf181"
+    },
+    {
+      "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\clean\\foto.jpg",
+      "hash": "17d41de95a4c518207126231742f96b1763b9c68e3d976333c75b31883e6eb6d"
+    },
+    {
+      "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\clean\\imagen.png",
+      "hash": "78e0f442fc2f9256f3e8fc9f2a7f052feda895d02d85f78447133f9bbf8d44fb"
+    },
+    {
+      "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\clean\\nota.txt",
+      "hash": "e5da612a6bf69d648af00bec4c16fc8392e962f125f4bde4faaf482001e7f350"
+    },
+    {
+      "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\clean\\reporte.docx",
+      "hash": "6f9557d310d58b888c1f739236db3d3d269d20c142c89c6af7a6d4075d461e74"
+    },
+    {
+      "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\clean\\test_extenso.pdf",
+      "hash": "1fb256bfc6fbff00ec76f860276f36f4198830e20d8f0d98f550f8e90e93e691"
+    }
+  ]
+}

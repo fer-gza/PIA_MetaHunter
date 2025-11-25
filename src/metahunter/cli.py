@@ -77,7 +77,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--stats-path",
         type=Path,
-        help="Ruta del JSON con estadísticas (por defecto: examples/stats_<run_id>.json).",
+        help="Ruta del JSON con estadísticas de los archivos RAW (por defecto: examples/stats_<run_id>.json).",
     )
     parser.add_argument(
         "--ai-summary-path",
@@ -93,7 +93,7 @@ def parse_args() -> argparse.Namespace:
         "--integrity-report",
         dest="integrity_report_path",
         type=Path,
-        help="Ruta de un JSON donde se guardará el reporte de integridad (Merkle root).",
+        help="Ruta de un JSON donde se guardará el reporte de integridad (Merkle root) de los archivos LIMPIOS.",
     )
 
     return parser.parse_args()
@@ -152,8 +152,8 @@ def run_pipeline(
         },
     )
 
-    files = _collect_input_files(input_dir)
-    if not files:
+    raw_files = _collect_input_files(input_dir)
+    if not raw_files:
         log_event(
             log_path,
             run_id,
@@ -166,20 +166,36 @@ def run_pipeline(
         return
 
     # -----------------------------------------------------------------------
-    # 1) Limpieza de metadatos + cálculo de hashes limpios
+    # ANÁLISIS DE ARCHIVOS RAW (ANTES DE LIMPIAR)
     # -----------------------------------------------------------------------
-    clean_files: List[Path] = []
+    stats = analyzer.analyze_files(raw_files)
+    analyzer.save_stats(stats, stats_path)
+
+    log_event(
+        log_path,
+        run_id,
+        "analyzer",
+        "INFO",
+        "stats_saved",
+        {"output": str(stats_path), "files": len(stats)},
+    )
+    print(f"[analyzer] Stats de archivos RAW guardadas en {stats_path}")
+
+    # -----------------------------------------------------------------------
+    #    LIMPIEZA DE METADATOS → archivos limpios en output_dir
+    #    y cálculo de hashes de los archivos limpios para integridad/Merkle
+    # -----------------------------------------------------------------------
     processed_hashes: Dict[str, str] = {}
 
-    for f in files:
+    for f in raw_files:
         out_path = output_dir / f.name
 
         try:
-            # Se asume que cleaner.clean_file existe y limpia metadatos
             cleaner.clean_file(f, out_path)
 
-            # Después de limpiar, dejamos que analyzer recalcule el hash SHA-256
-            clean_files.append(out_path)
+            # Hash de archivo LIMPIO para el reporte de integridad
+            clean_sha = analyzer._hash_file(out_path)  # reutilizamos helper interno
+            processed_hashes[str(out_path)] = clean_sha
 
             log_event(
                 log_path,
@@ -202,29 +218,7 @@ def run_pipeline(
             print(f"[cleaner] ERR {f}: {e}")
 
     # -----------------------------------------------------------------------
-    # 2) Análisis técnico + avanzado (riesgo, forense, IA-heurstica)
-    # -----------------------------------------------------------------------
-    stats = analyzer.analyze_files(clean_files)
-    analyzer.save_stats(stats, stats_path)
-
-    log_event(
-        log_path,
-        run_id,
-        "analyzer",
-        "INFO",
-        "stats_saved",
-        {"output": str(stats_path), "files": len(stats)},
-    )
-    print(f"[analyzer] Stats guardadas en {stats_path}")
-
-    # Para el reporte de integridad, sacamos los hashes limpios del dict stats
-    for file_path, info in stats.items():
-        sha256 = info.get("sha256")
-        if sha256:
-            processed_hashes[file_path] = sha256
-
-    # -----------------------------------------------------------------------
-    # 3) IA (opcional) - resumen + reporte Markdown
+    # IA (opcional) - resumen + reporte Markdown, usando STATS de los RAW
     # -----------------------------------------------------------------------
     if use_ai:
         try:
@@ -263,7 +257,7 @@ def run_pipeline(
             print(f"[ai_client] ERROR ejecutando IA: {e}")
 
     # -----------------------------------------------------------------------
-    # 4) Reporte de integridad (Merkle root)
+    # Reporte de integridad (Merkle root) de archivos LIMPIOS
     # -----------------------------------------------------------------------
     if integrity_report_path is not None and processed_hashes:
         try:
@@ -299,7 +293,7 @@ def run_pipeline(
             print(f"[integrity] ERROR generando reporte de integridad: {e}")
 
     # -----------------------------------------------------------------------
-    # 5) Fin de ejecución
+    # Fin de ejecución
     # -----------------------------------------------------------------------
     log_event(
         log_path,
@@ -307,9 +301,9 @@ def run_pipeline(
         "cli",
         "INFO",
         "run_finished",
-        {"files_processed": len(clean_files)},
+        {"files_processed": len(raw_files)},
     )
-    print(f"[MetaHunter] Ejecución completada. Archivos procesados: {len(clean_files)}")
+    print(f"[MetaHunter] Ejecución completada. Archivos procesados: {len(raw_files)}")
 
 
 def main() -> None:
