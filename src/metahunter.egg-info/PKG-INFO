@@ -26,8 +26,9 @@ Requires-Dist: flake8>=6.1.0; extra == "dev"
 Requires-Dist: black>=24.4.0; extra == "dev"
 Dynamic: license-file
 
+
 # 🧠 MetaHunter  
-## Escáner, limpiador y analizador inteligente de metadatos  
+## Escáner, limpiador, analizador avanzado y verificador criptográfico de metadatos  
 ### Fernando Garza Chávez  
 ### Kevin Daniel Grimaldo Esquivel  
 ### Alejandro Martínez Moya  
@@ -36,80 +37,114 @@ Dynamic: license-file
 
 # 📘 Descripción general
 
-**MetaHunter** es una herramienta multiplataforma desarrollada en **Python + PowerShell + Bash** que automatiza el procesamiento de archivos para:
+**MetaHunter** es una herramienta multiplataforma desarrollada en **Python + PowerShell + Bash** diseñada para automatizar y asegurar el manejo de archivos corporativos mediante:
 
-- Detectar y eliminar metadatos ocultos.
-- Analizar archivos técnicamente (tamaño, tipo, hash).
-- Generar resúmenes automáticos con Inteligencia Artificial.
-- Crear un reporte técnico final en formato Markdown.
-- Registrar toda la ejecución en logs JSONL estructurados.
+- **Análisis técnico** completo (tipo, hash, extensión, tamaño).
+- **Clasificación de riesgo** basada en metadatos sensibles.
+- **Reconstrucción forense** (línea del tiempo del archivo).
+- **Detección de contenido generado por IA**.
+- **Limpieza profunda de metadatos** en PDF, imágenes, DOCX y más.
+- **Verificación criptográfica de integridad** utilizando *Merkle Trees*.
+- **Generación automática de reportes con IA**.
+- **Logging estructurado JSONL** para auditorías profesionales.
 
-El objetivo es proteger la privacidad, facilitar auditorías digitales y automatizar procesos críticos en el tratamiento de documentos corporativos.
-
----
-
-# 🚀 Funcionalidades principales
-
-### 🧹 1. Limpieza de metadatos — `cleaner.py`
-- Elimina metadatos EXIF, XMP, IPTC y propiedades internas.
-- Compatible con: **PDF, DOCX, JPG, PNG**.
-- Genera hash pre y post limpieza para validar integridad.
+El objetivo es proteger la privacidad, mejorar los flujos de auditoría y ofrecer un pipeline de ciberseguridad reproducible y automatizado.
 
 ---
 
-### 📊 2. Análisis técnico — `analyzer.py`
-Calcula:
+# 🚀 Novedades y mejoras recientes
 
-- Tamaño exacto por archivo  
-- Hash SHA-256  
-- Tipo MIME  
+MetaHunter ahora incluye capacidades avanzadas:
+
+## 🔥 1. Análisis avanzado — `advanced.py`
+Nuevo módulo que agrega:
+- Clasificación de riesgo (**BAJO / MEDIO / ALTO**).
+- Reconstrucción de línea forense (fechas, dispositivo, software).
+- Detección heurística de archivos generados por IA.
+- Evaluación automática según:
+  - GPS
+  - Autor
+  - Empresa
+  - Software corporativo (Microsoft/Adobe)
+  - Rutas internas sensibles
+
+## 🧠 2. Integración IA mejorada — `ai_client.py`
+- Genera **resúmenes JSON**.
+- Crea **reportes Markdown** para auditoría.
+- Si existe `OPENAI_API_KEY`, añade un análisis profesional generado por IA.
+- Si NO existe, no truena: genera reporte local sin IA.
+
+## 🔗 3. Verificación de integridad — `integrity.py`
+- Cálculo de hashes SHA-256 de archivos limpios.
+- Construcción de un **Merkle Tree**.
+- Generación de reporte criptográfico:
+
+```
+reports/integrity_<run_id>.json
+```
+
+## 🎯 4. Pipeline perfeccionado — `cli.py`
+Ahora el proceso es:
+
+```
+RAW → ANALYSIS → CLEANING → MERKLE TREE → IA REPORT
+```
+
+Así se conserva el análisis real del archivo ANTES de limpiarlo.
+
+---
+
+# 🧹 5. Limpieza profunda — `cleaner.py`
+Compatible con:
+- JPG (EXIF)
+- PNG (chunks)
+- PDF (propiedades internas)
+- DOCX (propiedades de Office)
+- TXT / CSV / MD (normalizado)
+
+---
+
+# 📊 6. Análisis técnico — `analyzer.py`
+Extrae automáticamente:
+
+- Tamaño exacto  
 - Extensión  
-- Conteo básico de contenido (TXT/MD)  
-- Resumen técnico global
+- Tipo MIME  
+- SHA-256  
+- Atributos enriquecidos  
+- Heurísticas para demo (GPS, empresa, IA, autor, etc.)
 
-El resultado se guarda en:
+Salida estándar:
 
 📄 `examples/stats_<run_id>.json`
 
 ---
 
-### 🤖 3. Inteligencia Artificial — `ai_client.py`
-La IA se utiliza para:
+# 🔗 Pipeline técnico completo — `cli.py`
 
-- Resumir lo realizado por el pipeline.  
-- Describir archivos, riesgos, cambios y limpieza.  
-- Generar un reporte detallado en Markdown.
+El pipeline realiza automáticamente:
 
-Resultados:
-
-📘 `examples/ai_summary_<run_id>.json`  
-📑 `reports/ai_report_<run_id>.md`
-
----
-
-### 🔗 4. Pipeline técnico completo — `cli.py`
-Integra todas las tareas:
-
-1. Escaneo de archivos  
-2. Limpieza  
-3. Análisis técnico  
-4. IA (opcional)  
-5. Logging estructurado  
-6. Exportación de reportes
+1. **Escaneo RAW**
+2. **Análisis avanzado (riesgo, IA, forense)**
+3. **Limpieza de metadatos**
+4. **Hashing + Merkle Root**
+5. **Resumen IA (opcional)**
+6. **Reporte Markdown**
+7. **Logging JSONL**
 
 ---
 
-### ⚙️ 5. Scripts de orquestación
+# ⚙️ Scripts de orquestación
 
 | Script | Uso |
 |--------|------|
-| `scripts/run_pipeline.ps1` | Ejecutar todo el pipeline en Windows |
-| `scripts/run_pipeline.sh` | Ejecutar en Linux/Mac |
-| `metahunter` (entry point global) | Ejecutar desde cualquier computadora sin rutas |
+| `scripts/run_pipeline.ps1` | Ejecuta todo el pipeline en Windows |
+| `scripts/run_pipeline.sh` | Ejecuta en Linux/Mac |
+| `metahunter` (entry point global) | Ejecutar desde cualquier ubicación |
 
 ---
 
-# 📁 Estructura del proyecto
+# 📁 Estructura del repositorio
 
 ```
 PIA_MetaHunter/
@@ -118,6 +153,8 @@ PIA_MetaHunter/
 │   └── metahunter/
 │       ├── cleaner.py
 │       ├── analyzer.py
+│       ├── advanced.py
+│       ├── integrity.py
 │       ├── ai_client.py
 │       ├── cli.py
 │       ├── __main__.py
@@ -132,7 +169,8 @@ PIA_MetaHunter/
 │   └── ai_summary_*.json
 │
 ├── reports/
-│   └── ai_report_*.md
+│   ├── ai_report_*.md
+│   └── integrity_*.json
 │
 ├── docs/
 │   ├── ai_plan.md
@@ -153,13 +191,13 @@ PIA_MetaHunter/
 
 # 🔧 Instalación
 
-### 📌 Instalar como paquete global
+### 📌 Instalar en modo desarrollo
 
 ```
 pip install -e .
 ```
 
-Esto crea el comando:
+Esto habilita el comando:
 
 ```
 metahunter
@@ -169,30 +207,31 @@ metahunter
 
 # ▶️ Uso del programa
 
-### 🔵 Ejecutar sin entorno virtual
+### 🔵 Ejecución estándar
+
+```
+metahunter --input-dir data/raw --output-dir data/clean --log-path examples/logs.jsonl --stats-path examples/stats.json --integrity-report reports/integrity.json
+```
+
+### 🔵 Ejecutar con IA
 
 ```
 metahunter --input-dir data/raw --output-dir data/clean --log-path examples/logs.jsonl --use-ai
 ```
 
----
-
 ### 🔵 Ejecutar dentro de un venv
 
 ```
-python -m metahunter.cli --input-dir data/raw --output-dir data/clean --log-path examples/logs.jsonl --use-ai
+python -m metahunter.cli --input-dir data/raw --output-dir data/clean --log-path examples/logs.jsonl
 ```
 
----
-
-### 🔵 PowerShell
+### 🔵 Ejecutar desde Powershell
 
 ```
-.\scripts
-un_pipeline.ps1
+.\scripts\run_pipeline.ps1
 ```
 
-### 🔵 Bash
+### 🔵 Ejecutar desde Bash
 
 ```
 ./scripts/run_pipeline.sh
@@ -202,17 +241,14 @@ un_pipeline.ps1
 
 # 📝 Ejemplos de salida
 
-### ✔ Archivo limpio:
+### ✔ Archivo limpio
 ```
-data/clean/test.pdf
+data/clean/contrato_meta.pdf
 ```
 
----
+### ✔ Logs estructurados en JSONL
 
-### ✔ Logs estructurados
-`examples/logs.jsonl`
-
-Ejemplo real:
+`examples/logs.jsonl`:
 
 ```json
 {
@@ -233,28 +269,21 @@ Ejemplo real:
 # 📑 Documentación incluida
 
 📘 `/docs/ai_plan.md` → Plan formal de integración de IA  
-📗 `/docs/entregable_4.md` → Avance para el cuarto entregable  
+📗 `/docs/entregable_4.md` → Documentación del entregable 4  
 
 ---
 
-# 🔥 Estado actual del proyecto — Entregable 4
+# 🔥 Estado actual del proyecto — Entregable Final
 
 | Requisito | Estado |
-|----------|---------|
+|----------|--------|
 | Mínimo dos tareas funcionales | ✔ cleaner + analyzer |
-| IA integrada | ✔ ai_client funcionando |
-| Pipeline técnico consolidado | ✔ cli.py completo |
-| Evidencia reproducible | ✔ examples/ y reports/ |
-| Logging estructurado | ✔ logs.jsonl |
-| prompts/ creado | ✔ prompt_v1.json |
-| Orquestación (PS1 / SH) | ✔ scripts |
-| Lectura y ejecución global | ✔ `pip install -e .` |
-| README actualizado | ✔ Completo |
-
----
-
-# 👥 Autores
-
-**Fernando Garza Chávez**  
-**Kevin Daniel Grimaldo Esquivel**  
-**Alejandro Martínez Moya**
+| Integración IA | ✔ ai_client completo |
+| Pipeline técnico | ✔ cli.py avanzado |
+| Logging | ✔ JSONL estructurado |
+| Reportes automáticos | ✔ AI + Markdown |
+| Verificación criptográfica | ✔ Merkle root funcionando |
+| Evidencia reproducible | ✔ examples + reports |
+| Documentación clara | ✔ README actualizado |
+| Scripts de orquestación | ✔ PS1 / SH |
+| Análisis RAW + Limpieza | ✔ Implementado |

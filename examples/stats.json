@@ -1,0 +1,252 @@
+{
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\contrato_fix.pdf": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\contrato_fix.pdf",
+    "name": "contrato_fix.pdf",
+    "extension": ".pdf",
+    "mime_type": "application/pdf",
+    "size_bytes": 1488,
+    "sha256": "8c2936db1400086f16a1c730d70f47b0bb68014b6df2b41de68cade8bf0471ef",
+    "author": "Kevin Daniel",
+    "company": "MetaCorp Security",
+    "creator_tool": "Microsoft Word",
+    "software": "Adobe Acrobat Pro",
+    "advanced": {
+      "risk_score": 60,
+      "risk_level": "MEDIO",
+      "risk_reasons": [
+        "Metadatos indican autor: 'Kevin Daniel'.",
+        "Metadatos incluyen organización/empresa: 'MetaCorp Security'.",
+        "Indica software de oficina/corporativo en metadatos (Microsoft/Adobe/etc.).",
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "Herramienta de creación/edición: Microsoft Word."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\foto.jpg": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\foto.jpg",
+    "name": "foto.jpg",
+    "extension": ".jpg",
+    "mime_type": "image/jpeg",
+    "size_bytes": 1305,
+    "sha256": "17d41de95a4c518207126231742f96b1763b9c68e3d976333c75b31883e6eb6d",
+    "advanced": {
+      "risk_score": 15,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\foto_gps.jpg": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\foto_gps.jpg",
+    "name": "foto_gps.jpg",
+    "extension": ".jpg",
+    "mime_type": "image/jpeg",
+    "size_bytes": 2528,
+    "sha256": "095c3d8b5067733bea752377d4cb8ef751ec1b517d5ba8a9afb31b66dedc5123",
+    "gps_latitude": 25.6866,
+    "gps_longitude": -100.3161,
+    "author": "Kevin Daniel",
+    "advanced": {
+      "risk_score": 70,
+      "risk_level": "ALTO",
+      "risk_reasons": [
+        "Contiene coordenadas GPS en metadatos (posible filtración de ubicación).",
+        "Metadatos indican autor: 'Kevin Daniel'.",
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "Coordenadas en EXIF: lat=25.6866, lon=-100.3161."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\foto_normal.png": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\foto_normal.png",
+    "name": "foto_normal.png",
+    "extension": ".png",
+    "mime_type": "image/png",
+    "size_bytes": 912,
+    "sha256": "b5eca5023920da0003b73852b60acb5c0651af7a221bf9596f04e2d320e2d9f4",
+    "advanced": {
+      "risk_score": 15,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\imagen.png": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\imagen.png",
+    "name": "imagen.png",
+    "extension": ".png",
+    "mime_type": "image/png",
+    "size_bytes": 586,
+    "sha256": "78e0f442fc2f9256f3e8fc9f2a7f052feda895d02d85f78447133f9bbf8d44fb",
+    "advanced": {
+      "risk_score": 15,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\imagen_ia.png": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\imagen_ia.png",
+    "name": "imagen_ia.png",
+    "extension": ".png",
+    "mime_type": "image/png",
+    "size_bytes": 1182,
+    "sha256": "a7a97ddd1eb9a52dae50996abda34dcd93dcaac6f0fc7346f13c484241e1cd8a",
+    "software": "Midjourney AI",
+    "advanced": {
+      "risk_score": 15,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "Herramienta de creación/edición: Midjourney AI."
+      ],
+      "ai_generated": true,
+      "ai_evidence": [
+        "Coincidencia de 'midjourney' en metadatos."
+      ]
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\nota.txt": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\nota.txt",
+    "name": "nota.txt",
+    "extension": ".txt",
+    "mime_type": "text/plain",
+    "size_bytes": 31,
+    "sha256": "e5da612a6bf69d648af00bec4c16fc8392e962f125f4bde4faaf482001e7f350",
+    "advanced": {
+      "risk_score": 10,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\nota_sensible.txt": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\nota_sensible.txt",
+    "name": "nota_sensible.txt",
+    "extension": ".txt",
+    "mime_type": "text/plain",
+    "size_bytes": 140,
+    "sha256": "b37f88e67243c117ddc256fcd2494c110fe65c04f6e611846491fb7a4bff0286",
+    "advanced": {
+      "risk_score": 10,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\reporte.docx": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\reporte.docx",
+    "name": "reporte.docx",
+    "extension": ".docx",
+    "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "size_bytes": 36643,
+    "sha256": "6f9557d310d58b888c1f739236db3d3d269d20c142c89c6af7a6d4075d461e74",
+    "advanced": {
+      "risk_score": 15,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\reporte_corporativo.docx": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\reporte_corporativo.docx",
+    "name": "reporte_corporativo.docx",
+    "extension": ".docx",
+    "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "size_bytes": 36781,
+    "sha256": "115c0fa662e85f95a70cd1670956a3ba17f6fa86604243ca2513f7256e18cbbc",
+    "author": "Kevin Daniel",
+    "company": "MetaCorp Technologies",
+    "creator_tool": "Microsoft Word",
+    "advanced": {
+      "risk_score": 60,
+      "risk_level": "MEDIO",
+      "risk_reasons": [
+        "Metadatos indican autor: 'Kevin Daniel'.",
+        "Metadatos incluyen organización/empresa: 'MetaCorp Technologies'.",
+        "Indica software de oficina/corporativo en metadatos (Microsoft/Adobe/etc.).",
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "Herramienta de creación/edición: Microsoft Word."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  },
+  "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\test_extenso.pdf": {
+    "path": "C:\\Users\\Kevin G\\Documents\\GitHub\\PIA_MetaHunter\\data\\raw\\test_extenso.pdf",
+    "name": "test_extenso.pdf",
+    "extension": ".pdf",
+    "mime_type": "application/pdf",
+    "size_bytes": 7630,
+    "sha256": "88bfb93de5ccf59ec42c12016c697b249c0d2a0c5d2e6ca799bb08a3a8f17798",
+    "advanced": {
+      "risk_score": 15,
+      "risk_level": "BAJO",
+      "risk_reasons": [
+        "Ruta del archivo sugiere estructura interna de usuario/equipo.",
+        "Formato proclive a contener metadatos sensibles (PDF/Word/imagen)."
+      ],
+      "forensic_timeline": [
+        "No se encontraron metadatos suficientes para reconstruir la línea del tiempo."
+      ],
+      "ai_generated": false,
+      "ai_evidence": []
+    }
+  }
+}

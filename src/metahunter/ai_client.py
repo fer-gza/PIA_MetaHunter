@@ -188,15 +188,44 @@ def _build_markdown_report(
 # (Opcional) Enriquecer el reporte con un LLM de OpenAI
 # ---------------------------------------------------------------------------
 
-def _call_openai_if_available(summary: RiskSummary, stats: Dict[str, Any]) -> str | None:
+def _call_openai_if_available(
+    summary: RiskSummary,
+    stats: Dict[str, Any],
+    run_id: str | None = None,
+    log_path: Path | None = None,
+) -> str | None:
     """
     Intenta generar un comentario extra usando OpenAI si:
       - Existe OPENAI_API_KEY
       - Está instalado el SDK (nuevo o viejo)
     Si algo falla, devuelve None y el resto del pipeline sigue normal.
+    Además, escribe eventos de logging detallados para depuración.
     """
+
+    def _log_local(level: str, event: str, details: Dict | None = None) -> None:
+        if log_path is None or run_id is None:
+            return
+        try:
+            _log_event(
+                log_path,
+                run_id,
+                "ai_client",
+                level,
+                event,
+                details or {},
+            )
+        except Exception:
+            # No queremos que un fallo de logging rompa el pipeline de IA
+            return
+
     api_key = os.getenv("OPENAI_API_KEY")
+
     if not api_key:
+        _log_local(
+            "INFO",
+            "ai_openai_skipped_no_key",
+            {"reason": "OPENAI_API_KEY no configurada o vacía."},
+        )
         return None
 
     # Texto base para describir el resumen
@@ -216,38 +245,72 @@ Escribe un comentario corto (2-3 párrafos) explicando:
 3) Una recomendación concreta para el siguiente paso.
 """
 
+    _log_local(
+        "INFO",
+        "ai_openai_call_started",
+        {
+            "has_new_sdk": _HAS_OPENAI_NEW,
+            "has_old_sdk": _HAS_OPENAI_OLD,
+        },
+    )
+
     try:
         # SDK nuevo
         if _HAS_OPENAI_NEW and OpenAI is not None:
             client = OpenAI(api_key=api_key)
             resp = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "Eres un analista de ciberseguridad especializado en metadatos."},
                     {"role": "user", "content": base_prompt},
                 ],
                 temperature=0.4,
             )
-            return resp.choices[0].message.content  # type: ignore[return-value]
+            content = resp.choices[0].message.content  # type: ignore[assignment]
+            _log_local(
+                "INFO",
+                "ai_openai_call_success",
+                {"sdk": "new", "model": "gpt-3.5-turbo"},
+            )
+            return content
 
         # SDK viejo
         if _HAS_OPENAI_OLD and openai is not None:
             openai.api_key = api_key
             resp = openai.ChatCompletion.create(
-                model="gpt-4o-mini",
+                model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "Eres un analista de ciberseguridad especializado en metadatos."},
                     {"role": "user", "content": base_prompt},
                 ],
                 temperature=0.4,
             )
-            return resp.choices[0].message["content"]  # type: ignore[index]
+            content = resp.choices[0].message["content"]  # type: ignore[index]
+            _log_local(
+                "INFO",
+                "ai_openai_call_success",
+                {"sdk": "old", "model": "gpt-3.5-turbo"},
+            )
+            return content
 
-    except Exception:
-        # Si algo falla con la API, simplemente no añadimos comentario extra
+        _log_local(
+            "WARNING",
+            "ai_openai_no_sdk",
+            {
+                "reason": "No se encontró ni el SDK nuevo ni el viejo de OpenAI.",
+                "has_new_sdk": _HAS_OPENAI_NEW,
+                "has_old_sdk": _HAS_OPENAI_OLD,
+            },
+        )
         return None
 
-    return None
+    except Exception as e:
+        _log_local(
+            "ERROR",
+            "ai_openai_error",
+            {"error": repr(e)},
+        )
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -295,6 +358,7 @@ def run_ai_pipeline(
     4) Si hay OPENAI_API_KEY y la librería está instalada, añade
        una sección extra con observaciones generadas por IA.
     """
+
     stats_path = stats_path.resolve()
     summary_path = summary_path.resolve()
     report_path = report_path.resolve()
@@ -338,7 +402,7 @@ def run_ai_pipeline(
     base_report = _build_markdown_report(summary, stats, run_id)
 
     # 4) Intentar añadir comentario de IA (si está disponible la API)
-    ai_comment = _call_openai_if_available(summary, stats)
+    ai_comment = _call_openai_if_available(summary, stats, run_id=run_id, log_path=log_path)
 
     report_text = base_report
     if ai_comment:

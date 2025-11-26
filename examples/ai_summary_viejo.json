@@ -1,0 +1,21 @@
+{
+  "analyst_commentary": {
+    "summary": "El análisis general muestra que la mayoría de los documentos presentan un nivel de riesgo bajo, lo que indica prácticas relativamente estables en el manejo de archivos. Sin embargo, se detectaron algunos elementos que requieren atención especial, en particular los archivos que contienen metadatos sensibles relacionados con ubicación o información corporativa. Estos casos representan un riesgo adicional al exponer datos que podrían ser explotados para reconstruir contextos internos o identificar a los creadores de contenido.",
+    "priority_risks": "El archivo con riesgo ALTO corresponde a una fotografía con coordenadas GPS incrustadas en los metadatos, lo que expone la ubicación exacta donde fue capturada. Además, dos archivos de riesgo MEDIO (un PDF y un documento DOCX) contienen metadatos como autores, software utilizado y marcas internas que pueden revelar procesos o identidades. Estos tipos de archivos deberían ser revisados de forma prioritaria antes de ser compartidos fuera de la organización.",
+    "recommendation": "Para mejorar la protección de la información, se recomienda integrar MetaHunter como paso obligatorio dentro del flujo de revisión y publicación de documentos. Las imágenes provenientes de dispositivos móviles deben limpiarse sistemáticamente para eliminar geolocalización, y se sugiere aplicar políticas de control de metadatos en documentos de oficina. Finalmente, mantener una revisión periódica del almacenamiento compartido puede ayudar a identificar archivos con riesgo elevado antes de su distribución."
+  },
+  "metadata": {
+    "total_files": 11,
+    "risk_high": 1,
+    "risk_medium": 2,
+    "risk_low": 8,
+    "ai_generated_detected": 1,
+    "extensions_detected": {
+      ".docx": 2,
+      ".jpg": 2,
+      ".pdf": 2,
+      ".png": 3,
+      ".txt": 2
+    }
+  }
+}

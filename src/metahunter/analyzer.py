@@ -39,65 +39,31 @@ def _guess_mime_type(path: Path) -> str:
 
 def _enrich_metadata_heuristic(base: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Agrega metadatos "lógicos" en base al nombre del archivo.
-    Esto permite que algunos archivos DEMO se clasifiquen como
-    riesgo MEDIO/ALTO sin depender de librerías externas.
-
-    Archivos pensados:
-      - foto_gps.jpg              -> riesgo ALTO (GPS + autor)
-      - contrato_meta.pdf         -> riesgo MEDIO (autor + empresa + software)
-      - reporte_corporativo.docx  -> riesgo MEDIO (autor + empresa)
-      - imagen_ia.png             -> detectado como generado por IA
+    Clasifica archivos DEMO según su nombre, pero sin inyectar metadatos.
+    Solo ajusta banderas de riesgo basadas en patrones realistas.
     """
+
     name = str(base.get("name", "")).lower()
-    path = str(base.get("path", ""))
 
-    # Aseguramos que los campos existan aunque sea como string vacío
-    author = base.get("author", "")
-    company = base.get("company", "")
-    creator_tool = base.get("creator_tool", "")
-    software = base.get("software", "")
+    # Solo marcamos indicios, NO datos personales
+    indicators = []
 
-    # 1) Archivo con GPS (simulado) → ALTO
-    if "foto_gps" in name:
-        author = author or "Kevin Daniel"
-        base["gps_latitude"] = 25.6866   # Coordenadas de ejemplo (Monterrey)
-        base["gps_longitude"] = -100.3161
+    if "gps" in name:
+        indicators.append("posible información de ubicación")
+        base["has_gps_metadata"] = True
 
-    # 2) Contrato corporativo → MEDIO (autor + empresa + software)
-    if "contrato_meta" in name or "contrato" in name:
-        author = author or "Kevin Daniel"
-        company = company or "MetaCorp Security"
-        creator_tool = creator_tool or "Microsoft Word"
-        software = software or "Adobe Acrobat Pro"
+    if "contrato" in name or "corporativo" in name:
+        indicators.append("documento empresarial sensible")
 
-    # 3) Reporte corporativo → MEDIO (autor + empresa)
-    if "reporte_corporativo" in name:
-        author = author or "Kevin Daniel"
-        company = company or "MetaCorp Technologies"
-        creator_tool = creator_tool or "Microsoft Word"
+    if "ia" in name:
+        indicators.append("posible generación asistida por IA")
+        base["suspected_ai_generation"] = True
 
-    # 4) Imagen generada por IA → detectar Midjourney
-    if "imagen_ia" in name:
-        # Esto no cambia el score de riesgo directamente,
-        # pero permite que advanced.py detecte "midjourney" y marque ai_generated=True
-        if "midjourney" not in software.lower():
-            software = (software + " Midjourney AI").strip()
-
-    # Volvemos a escribir los campos enriquecidos
-    if author:
-        base["author"] = author
-    if company:
-        base["company"] = company
-    if creator_tool:
-        base["creator_tool"] = creator_tool
-    if software:
-        base["software"] = software
-
-    # El path ya trae la ruta real; eso activa la regla de "estructura interna de usuario"
-    base["path"] = path
+    if indicators:
+        base["risk_indicators"] = indicators
 
     return base
+
 
 
 def analyze_files(files: Iterable[Path]) -> Dict[str, Dict[str, Any]]:
