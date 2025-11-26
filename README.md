@@ -259,11 +259,3 @@ data/clean/contrato_meta.pdf
 | Documentación clara | ✔ README actualizado |
 | Scripts de orquestación | ✔ PS1 / SH |
 | Análisis RAW + Limpieza | ✔ Implementado |
-
----
-
-# 👥 Autores
-
-**Fernando Garza Chávez**  
-**Kevin Daniel Grimaldo Esquivel**  
-**Alejandro Martínez Moya**
